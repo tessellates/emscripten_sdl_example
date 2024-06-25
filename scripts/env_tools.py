@@ -31,5 +31,13 @@ def append_os_env(sh_file):
                 if key_value:
                     key = key_value.group(1)
                     value = key_value.group(2).strip('"')
-                    os.environ[key] = value
-                    print(f'Set {key}={value}')
+                    
+                    if key in os.environ:
+                        # Append the new value to the existing value
+                        os.environ[key] += f':{value}'
+                        print(f'Appended {value} to {key}, now {key}={os.environ[key]}')
+                    else:
+                        # Set the new value if the key does not exist
+                        os.environ[key] = value
+                        print(f'Set {key}={value}')
+                        
