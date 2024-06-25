@@ -8,7 +8,6 @@ buildinfo.json
 install
 .DS_Store
 runtime
-runtime/
 
 # Ignore conan files from local build or package test
 CMakeUserPresets.json
