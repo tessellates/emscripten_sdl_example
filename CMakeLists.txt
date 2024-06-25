@@ -16,7 +16,7 @@ endif()
 set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${CMAKE_CURRENT_SOURCE_DIR}/build")
 
 if(EMSCRIPTEN)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s USE_SDL_TTF=2 -g4")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_SDL=2 -s USE_SDL_TTF=2 -s USE_SDL_IMAGE=2 -g4 --preload-file assets --use-preload-plugins")
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
     set(EXECUTABLE_NAME "index")
 else()
@@ -26,7 +26,7 @@ else()
     set(EXECUTABLE_NAME "my_sdl2_project")
 endif()
 
-add_executable(${EXECUTABLE_NAME} main.cpp)
+add_executable(${EXECUTABLE_NAME} main.cpp Utilities.cpp)
 
 if(NOT EMSCRIPTEN)
     target_include_directories(${EXECUTABLE_NAME} PRIVATE ${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIRS} ${SDL2_TTF_INCLUDE_DIRS})
@@ -51,5 +51,9 @@ if(EMSCRIPTEN)
     install(FILES ${CMAKE_BINARY_DIR}/bin/${EXECUTABLE_NAME}.wasm
                   ${CMAKE_BINARY_DIR}/bin/${EXECUTABLE_NAME}.js
                   ${CMAKE_BINARY_DIR}/bin/${EXECUTABLE_NAME}.wasm.map
+                  ${CMAKE_BINARY_DIR}/bin/${EXECUTABLE_NAME}.data
             DESTINATION runtime)
 endif()
+
+# Copy assets to the build directory
+file(COPY assets/ DESTINATION ${CMAKE_BINARY_DIR}/assets)

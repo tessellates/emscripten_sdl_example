@@ -3,9 +3,11 @@
 #include <SDL2/SDL_image.h>
 #include <iostream>
 #include <emscripten.h>
+#include "Utilities.hpp"
 
 SDL_Renderer *ren;
 SDL_Window *win;
+SDL_Texture *test;
 bool run = true;
 SDL_Event event;
 int dex = 0;
@@ -33,15 +35,19 @@ void main_loop() {
             }
             if (event.key.keysym.sym == SDLK_UP) {
                 dey--;
+                dey--;
             }
 
             if (event.key.keysym.sym == SDLK_DOWN) {
                 dey++;
+                dey++;
             }
             if (event.key.keysym.sym == SDLK_RIGHT) {
                 dex++;
+                dex++;
             }
             if (event.key.keysym.sym == SDLK_LEFT) {
+                dex--;
                 dex--;
             }
             std::cout << "key press" << std::endl;
@@ -63,7 +69,8 @@ void main_loop() {
     // Render the rectangle
     SDL_SetRenderDrawColor(ren, 255, 255, 0, 255);
     SDL_RenderFillRect(ren, &rect);
-    SDL_GetError();
+
+    SDL_RenderCopy(ren, test, NULL, NULL);
 
     SDL_RenderPresent(ren);  // Present the renderer
 
@@ -82,17 +89,31 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::cout << 'trace timing' << std::endl;
+    int imgFlags = IMG_INIT_PNG;
+    if (!(IMG_Init(imgFlags) & imgFlags)) {
+        std::cout << "SDL_image initialization failed: " << IMG_GetError() << std::endl;
+    }
 
-    win = SDL_CreateWindow("Hello SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 1024, SDL_WINDOW_SHOWN);
+    // From 2.0.18: Enable native IME.
+    #ifdef SDL_HINT_IME_SHOW_UI
+    SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
+    #endif
+
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
+
+    // Initialize SDL_ttf
+    if (TTF_Init() == -1) {
+        std::cout << "SDL_ttf initialization failed: " << TTF_GetError() << std::endl;
+        SDL_Quit(); // Clean up SDL before exiting
+    }
+
+
+    win = SDL_CreateWindow("Hello SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 800, SDL_WINDOW_SHOWN);
     if (win == nullptr) {
         std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
         SDL_Quit();
         return 1;
     }
-
-    std::cout << 'trace timing' << std::endl;
-
 
     ren = SDL_CreateRenderer(win, -1, 0);
     if (ren == nullptr) {
@@ -102,24 +123,13 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::cout << 'trace timing' << std::endl;
-
-    //SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
-
-
-    // Initialize SDL_ttf
-    if (TTF_Init() == -1) {
-        std::cout << "SDL_ttf initialization failed: " << TTF_GetError() << std::endl;
-        SDL_Quit(); // Clean up SDL before exiting
-    }
-    // From 2.0.18: Enable native IME.
-    #ifdef SDL_HINT_IME_SHOW_UI
-    SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
-    #endif
-
     bool run = true;
     std::cout << "SDL2 setup complete. Running main loop..." << std::endl;
-
+    test = create_texture_from_file(ren, "assets/gba4.png");
+    if (test == nullptr)
+    {
+        std::cout <<"not texture" << std::endl;
+    }
     // Use Emscripten's main loop
     emscripten_set_main_loop(main_loop, 0, 1);
 

@@ -1,12 +1,5 @@
 #include "Utilities.hpp"
 
-#include "KIApplication.hpp"
-
-SDL_Texture* create_texture_from_file(const char* filePath)
-{
-    return create_texture_from_file(KIApplication::renderer, filePath);
-}
-
 SDL_Texture* create_texture_from_file(SDL_Renderer* renderer, const char* filePath)
 {
     // Load the image into an SDL_Surface
