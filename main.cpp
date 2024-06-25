@@ -55,23 +55,9 @@ void main_loop() {
         }
     }
 
-    SDL_SetRenderDrawColor(ren, 255, 0, 0, 255);
-    SDL_GetError();
+    SDL_SetRenderDrawColor(ren, 155, 88, 95, 255);
     SDL_RenderClear(ren);
-
-    // Define the rectangle dimensions
-    SDL_Rect rect;
-    rect.x = dex;  // x position
-    rect.y = dey;  // y position
-    rect.w = 400;  // width
-    rect.h = 300;  // height
-
-    // Render the rectangle
-    SDL_SetRenderDrawColor(ren, 255, 255, 0, 255);
-    SDL_RenderFillRect(ren, &rect);
-
     SDL_RenderCopy(ren, test, NULL, NULL);
-
     SDL_RenderPresent(ren);  // Present the renderer
 
     if (!run) {
@@ -107,8 +93,8 @@ int main(int argc, char* argv[]) {
         SDL_Quit(); // Clean up SDL before exiting
     }
 
-
-    win = SDL_CreateWindow("Hello SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 800, SDL_WINDOW_SHOWN);
+    int multiple = 5;
+    win = SDL_CreateWindow("Hello SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 256*multiple, 160*multiple, SDL_WINDOW_SHOWN);
     if (win == nullptr) {
         std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
         SDL_Quit();
