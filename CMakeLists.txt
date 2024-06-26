@@ -16,45 +16,28 @@ endif()
 set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${CMAKE_CURRENT_SOURCE_DIR}/build")
 
 if(EMSCRIPTEN)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_SDL=2 -s USE_SDL_TTF=2 -s USE_SDL_IMAGE=2 -g4 --preload-file assets --use-preload-plugins")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_SDL=2 -s USE_SDL_TTF=2 -s USE_SDL_IMAGE=2 -g4 --preload-file assets --use-preload-plugins")
     set(CMAKE_EXECUTABLE_SUFFIX ".html")
     set(EXECUTABLE_NAME "index")
 else()
     find_package(SDL2 REQUIRED CONFIG)
     find_package(SDL2_image REQUIRED CONFIG)
     find_package(SDL2_ttf REQUIRED CONFIG)
-    set(EXECUTABLE_NAME ${PROJECT_NAME})
+    set(EXECUTABLE_NAME driver)
 endif()
 
-add_executable(${EXECUTABLE_NAME} main.cpp Utilities.cpp)
+add_library(${PROJECT_NAME} STATIC)
 
 if(NOT EMSCRIPTEN)
-    target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2-static)
-    target_link_libraries(${PROJECT_NAME} PRIVATE SDL2_image::SDL2_image-static)
-    target_link_libraries(${PROJECT_NAME} PRIVATE SDL2_ttf::SDL2_ttf-static)
+    target_link_libraries(${PROJECT_NAME} PUBLIC SDL2::SDL2-static)
+    target_link_libraries(${PROJECT_NAME} PUBLIC SDL2_image::SDL2_image-static)
+    target_link_libraries(${PROJECT_NAME} PUBLIC SDL2_ttf::SDL2_ttf-static)
 else()
-    target_link_libraries(${EXECUTABLE_NAME} PRIVATE SDL2 SDL2_image SDL2_ttf)
+    target_link_libraries(${PROJECT_NAME} PUBLIC SDL2 SDL2_image SDL2_ttf)
 endif()
 
-install(
-    TARGETS ${EXECUTABLE_NAME}
-    ARCHIVE
-        DESTINATION runtime
-    LIBRARY
-        DESTINATION runtime
-    RUNTIME
-        DESTINATION runtime
-    INCLUDES 
-        DESTINATION runtime
-)
-
-if(EMSCRIPTEN)
-    install(FILES ${CMAKE_BINARY_DIR}/bin/${EXECUTABLE_NAME}.wasm
-                  ${CMAKE_BINARY_DIR}/bin/${EXECUTABLE_NAME}.js
-                  ${CMAKE_BINARY_DIR}/bin/${EXECUTABLE_NAME}.wasm.map
-                  ${CMAKE_BINARY_DIR}/bin/${EXECUTABLE_NAME}.data
-            DESTINATION runtime)
-endif()
+add_subdirectory(driver)
+add_subdirectory(source)
 
 # Copy assets to the build directory
 file(COPY assets/ DESTINATION ${CMAKE_BINARY_DIR}/assets)

@@ -5,7 +5,6 @@ import platform
 import argparse
 import subprocess
 
-profiles = {"Darwin":'MacosProfile.txt', "Windows":'WindowsProfile.txt', "Linux":'LinuxProfile.txt'}
 build_type = 'Debug'
 
 def main(setup = True, emscripten=False, runonly=True):
@@ -46,16 +45,19 @@ def main(setup = True, emscripten=False, runonly=True):
 
     else:
         if platform.system() == 'Windows':
-            subprocess.check_call([os.path.join('install', 'run', 'main.exe')])
+            subprocess.check_call([os.path.join('install', 'run', 'driver.exe')])
         else:
-            subprocess.check_call([f'./build/bin/emex'])
+            subprocess.check_call([f'./build/bin/driver'])
     print('-- end build script --')
     return
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="")
-    parser.add_argument('-ns', action='store_true', help='no setup')
-    parser.add_argument('-em', action='store_true', help='enable emscripten -- compile wasm, js and html file instead of binary')
-    parser.add_argument('-ro', action='store_true', help='run only -- launches your application')
+    parser.add_argument('-ns', '--no-setup', action='store_true', help='no setup')
+    parser.add_argument('-em', '--emscripten', action='store_true', help='enable emscripten -- compile wasm, js and html file instead of binary')
+    parser.add_argument('-ro', '--run-only', action='store_true', help='run only -- launches your application')
+    parser.add_argument('-cb', '--clean-build', action='store_true', help='clean build')
     argsparsed = parser.parse_args()
-    main(not argsparsed.ns, argsparsed.em,  argsparsed.ro)
+    if argsparsed.clean_build:
+        script_utils.remove_folder('build')
+    main(not argsparsed.no_setup, argsparsed.emscripten,  argsparsed.run_only)

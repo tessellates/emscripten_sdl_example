@@ -17,3 +17,10 @@ def copy_files(src, dest):
         dest_file = os.path.join(dest, filename)
         shutil.copy(src_file, dest_file)
         print(f"Copied {src_file} to {dest_file}")
+
+def remove_folder(folder_path):
+    if os.path.exists(folder_path):
+        shutil.rmtree(folder_path)
+        print(f"Removed folder: {folder_path}")
+    else:
+        print(f"Folder does not exist: {folder_path}")

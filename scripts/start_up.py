@@ -92,5 +92,3 @@ def start_up(port, output_html):
     except (KeyboardInterrupt, SystemExit):
         print("\nCtrl+C received. The server will be stopped, but the script will keep running.")
         signal_handler(emrun_process)
-
-    print("The script continues to run. Perform any other tasks here.")

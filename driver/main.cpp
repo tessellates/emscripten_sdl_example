@@ -6,61 +6,46 @@
 #include <emscripten.h>
 #endif
 #include "Utilities.hpp"
-
-SDL_Renderer *ren;
-SDL_Window *win;
-SDL_Texture *test;
-bool run = true;
-SDL_Event event;
-int dex = 0;
-int dey = 0;
+#include "ApplicationContext.hpp"
 
 void clean_up()
 {
-    SDL_DestroyRenderer(ren);
-    SDL_DestroyWindow(win);
+    SDL_DestroyRenderer(APP_RENDERER);
+    SDL_DestroyWindow(APP_WINDOW);
     SDL_Quit();
     std::cout << "Shutting down SDL2..." << std::endl;
 }
 
 void main_loop() {
     // Set swap interval after creating the renderer
-
-    while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_QUIT)
-            run = false;
-        if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(win))
-            run = false;
-        if (event.type == SDL_KEYDOWN) {
-            if (event.key.keysym.sym == SDLK_f) {
-                run = false;
+    auto& running = APP_CONTEXT.running;
+    auto test = APP_CONTEXT.test;
+    while (SDL_PollEvent(&APP_EVENT)) {
+        if (APP_EVENT.type == SDL_QUIT)
+            running = false;
+        if (APP_EVENT.type == SDL_WINDOWEVENT && APP_EVENT.window.event == SDL_WINDOWEVENT_CLOSE && APP_EVENT.window.windowID == SDL_GetWindowID(APP_WINDOW))
+            running = false;
+        if (APP_EVENT.type == SDL_KEYDOWN) {
+            if (APP_EVENT.key.keysym.sym == SDLK_f) {
+                running = false;
             }
-            if (event.key.keysym.sym == SDLK_UP) {
-                dey--;
-                dey--;
+            if (APP_EVENT.key.keysym.sym == SDLK_UP) {
             }
-
-            if (event.key.keysym.sym == SDLK_DOWN) {
-                dey++;
-                dey++;
+            if (APP_EVENT.key.keysym.sym == SDLK_DOWN) {
             }
-            if (event.key.keysym.sym == SDLK_RIGHT) {
-                dex++;
-                dex++;
+            if (APP_EVENT.key.keysym.sym == SDLK_RIGHT) {
             }
-            if (event.key.keysym.sym == SDLK_LEFT) {
-                dex--;
-                dex--;
+            if (APP_EVENT.key.keysym.sym == SDLK_LEFT) {
             }
         }
     }
 
-    SDL_SetRenderDrawColor(ren, 155, 88, 95, 255);
-    SDL_RenderClear(ren);
-    SDL_RenderCopy(ren, test, NULL, NULL);
-    SDL_RenderPresent(ren);  // Present the renderer
+    SDL_SetRenderDrawColor(APP_RENDERER, 155, 88, 95, 255);
+    SDL_RenderClear(APP_RENDERER);
+    SDL_RenderCopy(APP_RENDERER, test, NULL, NULL);
+    SDL_RenderPresent(APP_RENDERER);  // Present the renderer
 
-    if (!run) {
+    if (!running) {
         #ifdef __EMSCRIPTEN__
         emscripten_cancel_main_loop();
         #endif
@@ -96,23 +81,23 @@ int main(int argc, char* argv[]) {
     }
 
     int multiple = 5;
-    win = SDL_CreateWindow("Hello SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 256*multiple, 160*multiple, SDL_WINDOW_SHOWN);
-    if (win == nullptr) {
+    APP_WINDOW = SDL_CreateWindow("Hello SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 256*multiple, 160*multiple, SDL_WINDOW_SHOWN);
+    if (APP_WINDOW == nullptr) {
         std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
         SDL_Quit();
         return 1;
     }
 
-    ren = SDL_CreateRenderer(win, -1, 0);
-    if (ren == nullptr) {
-        SDL_DestroyWindow(win);
+    APP_RENDERER = SDL_CreateRenderer(APP_WINDOW, -1, 0);
+    if (APP_RENDERER == nullptr) {
+        SDL_DestroyWindow(APP_WINDOW);
         std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
         SDL_Quit();
         return 1;
     }
     std::cout << "SDL2 setup complete. Running main loop..." << std::endl;
-    test = create_texture_from_file(ren, "assets/gba4.png");
-    if (test == nullptr)
+    APP_CONTEXT.test = create_texture_from_file(APP_RENDERER, "assets/gba4.png");
+    if (APP_CONTEXT.test == nullptr)
     {
         std::cout <<"not texture" << std::endl;
     }
@@ -120,7 +105,7 @@ int main(int argc, char* argv[]) {
     // Use Emscripten's main loop
     emscripten_set_main_loop(main_loop, 0, 1);
     #else
-    while(run)
+    while(APP_CONTEXT.running)
     {
         main_loop();
     }
