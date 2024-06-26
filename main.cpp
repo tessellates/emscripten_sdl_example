@@ -2,7 +2,9 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 #include <iostream>
+#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+#endif
 #include "Utilities.hpp"
 
 SDL_Renderer *ren;
@@ -50,8 +52,6 @@ void main_loop() {
                 dex--;
                 dex--;
             }
-            std::cout << "key press" << std::endl;
-
         }
     }
 
@@ -61,7 +61,9 @@ void main_loop() {
     SDL_RenderPresent(ren);  // Present the renderer
 
     if (!run) {
+        #ifdef __EMSCRIPTEN__
         emscripten_cancel_main_loop();
+        #endif
         clean_up();
     }
 }
@@ -108,19 +110,21 @@ int main(int argc, char* argv[]) {
         SDL_Quit();
         return 1;
     }
-
-    bool run = true;
     std::cout << "SDL2 setup complete. Running main loop..." << std::endl;
     test = create_texture_from_file(ren, "assets/gba4.png");
     if (test == nullptr)
     {
         std::cout <<"not texture" << std::endl;
     }
+    #ifdef __EMSCRIPTEN__
     // Use Emscripten's main loop
     emscripten_set_main_loop(main_loop, 0, 1);
-
-    clean_up();
-
-    std::cout << "Shutting down SDL2..." << std::endl;
+    #else
+    while(run)
+    {
+        main_loop();
+    }
+    #endif
+    std::cout << "Shutdown finished" << std::endl;
     return 0;
 }

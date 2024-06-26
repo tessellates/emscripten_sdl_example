@@ -1,9 +1,54 @@
 import subprocess
 import signal
 import sys
-import webbrowser
-import time
-import threading
+import subprocess
+import re
+
+def generate_emscripten_profile(filename):
+    try:
+        # Run the 'clang --version' command and capture the output
+        result = subprocess.run(['clang', '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+        version_output = result.stdout
+
+        # Determine if it's apple-clang or regular clang and extract the version
+        if "Apple clang" in version_output:
+            compiler = "apple-clang"
+            version_match = re.search(r'Apple clang version (\d+(\.\d+)*)', version_output)
+        else:
+            compiler = "clang"
+            version_match = re.search(r'clang version (\d+(\.\d+)*)', version_output)
+
+        if not version_match:
+            raise ValueError("Could not parse clang version from output")
+
+        clang_version = version_match.group(1).split('.')[0]
+
+
+        
+    except (subprocess.CalledProcessError, ValueError):
+        # Default to Emscripten-provided clang version if system clang is not available
+        compiler = "clang"
+        clang_version = "emsdk-provided"
+
+    # Generate the profile content
+    profile_content = f"""[settings]
+os=Emscripten
+arch=wasm
+compiler={compiler}
+compiler.cppstd=gnu17
+compiler.libcxx=libc++
+compiler.version={clang_version}
+build_type=Release
+[tool_requires]
+emsdk/3.1.50
+"""
+
+    # Write the profile content to the specified file
+    with open(filename, 'w') as file:
+        file.write(profile_content)
+
+    print(f"Profile written to {filename}")
+
 
 server_running = True
 

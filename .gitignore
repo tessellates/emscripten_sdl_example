@@ -1,6 +1,6 @@
 # repo specific
 localconfig.json
-kai_o_venv
+emex_venv
 install_info.txt
 buildinfo.json
 .conan
@@ -8,6 +8,7 @@ buildinfo.json
 install
 .DS_Store
 runtime
+data/emprofile
 
 # Ignore conan files from local build or package test
 CMakeUserPresets.json
