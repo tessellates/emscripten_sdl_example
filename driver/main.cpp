@@ -5,8 +5,10 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif
-#include "Utilities.hpp"
 #include "ApplicationContext.hpp"
+#include "config.hpp"
+#include "initialize_context.hpp"
+#include "context_functions.hpp"
 
 void clean_up()
 {
@@ -18,34 +20,15 @@ void clean_up()
 
 void main_loop() {
     // Set swap interval after creating the renderer
-    auto& running = APP_CONTEXT.running;
-    auto test = APP_CONTEXT.test;
-    while (SDL_PollEvent(&APP_EVENT)) {
-        if (APP_EVENT.type == SDL_QUIT)
-            running = false;
-        if (APP_EVENT.type == SDL_WINDOWEVENT && APP_EVENT.window.event == SDL_WINDOWEVENT_CLOSE && APP_EVENT.window.windowID == SDL_GetWindowID(APP_WINDOW))
-            running = false;
-        if (APP_EVENT.type == SDL_KEYDOWN) {
-            if (APP_EVENT.key.keysym.sym == SDLK_f) {
-                running = false;
-            }
-            if (APP_EVENT.key.keysym.sym == SDLK_UP) {
-            }
-            if (APP_EVENT.key.keysym.sym == SDLK_DOWN) {
-            }
-            if (APP_EVENT.key.keysym.sym == SDLK_RIGHT) {
-            }
-            if (APP_EVENT.key.keysym.sym == SDLK_LEFT) {
-            }
-        }
-    }
-
+    parse_events();
     SDL_SetRenderDrawColor(APP_RENDERER, 155, 88, 95, 255);
     SDL_RenderClear(APP_RENDERER);
-    SDL_RenderCopy(APP_RENDERER, test, NULL, NULL);
+
+    render_loop();
+
     SDL_RenderPresent(APP_RENDERER);  // Present the renderer
 
-    if (!running) {
+    if (!APP_CONTEXT.running) {
         #ifdef __EMSCRIPTEN__
         emscripten_cancel_main_loop();
         #endif
@@ -80,8 +63,8 @@ int main(int argc, char* argv[]) {
         SDL_Quit(); // Clean up SDL before exiting
     }
 
-    int multiple = 5;
-    APP_WINDOW = SDL_CreateWindow("Hello SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 256*multiple, 160*multiple, SDL_WINDOW_SHOWN);
+    int multiple = config::window_multiple;
+    APP_WINDOW = SDL_CreateWindow("Hello SDL2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, config::gameboy_width*multiple, config::gameboy_height*multiple, SDL_WINDOW_SHOWN);
     if (APP_WINDOW == nullptr) {
         std::cout << "SDL_CreateWindow Error: " << SDL_GetError() << std::endl;
         SDL_Quit();
@@ -96,11 +79,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     std::cout << "SDL2 setup complete. Running main loop..." << std::endl;
-    APP_CONTEXT.test = create_texture_from_file(APP_RENDERER, "assets/gba4.png");
-    if (APP_CONTEXT.test == nullptr)
-    {
-        std::cout <<"not texture" << std::endl;
-    }
+
+    initalize_context();
+
     #ifdef __EMSCRIPTEN__
     // Use Emscripten's main loop
     emscripten_set_main_loop(main_loop, 0, 1);

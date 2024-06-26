@@ -26,6 +26,8 @@ else()
     set(EXECUTABLE_NAME driver)
 endif()
 
+find_package(glm REQUIRED CONFIG)
+
 add_library(${PROJECT_NAME} STATIC)
 
 if(NOT EMSCRIPTEN)
@@ -36,8 +38,10 @@ else()
     target_link_libraries(${PROJECT_NAME} PUBLIC SDL2 SDL2_image SDL2_ttf)
 endif()
 
+target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
+
 add_subdirectory(driver)
 add_subdirectory(source)
 
 # Copy assets to the build directory
-file(COPY assets/ DESTINATION ${CMAKE_BINARY_DIR}/assets)
+file(COPY assets/ DESTINATION ${CMAKE_BINARY_DIR}/driver/assets)
