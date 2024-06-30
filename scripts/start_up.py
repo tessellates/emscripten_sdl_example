@@ -25,10 +25,10 @@ def generate_emscripten_profile(filename):
 
 
         
-    except (subprocess.CalledProcessError, ValueError):
+    except Exception:
         # Default to Emscripten-provided clang version if system clang is not available
         compiler = "clang"
-        clang_version = "6"
+        clang_version = "6.0"
 
     # Generate the profile content
     profile_content = f"""[settings]
