@@ -7,9 +7,6 @@ target_include_directories(${PROJECT_NAME}
 # Sources
 target_sources(${PROJECT_NAME}
     PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/Utilities.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IDGrid.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Coordinate.cpp
 )
-
-add_subdirectory(context)
-add_subdirectory(grid)
-add_subdirectory(model)

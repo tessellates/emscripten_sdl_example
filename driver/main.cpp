@@ -9,6 +9,7 @@
 #include "config.hpp"
 #include "initialize_context.hpp"
 #include "context_functions.hpp"
+#include "model_init.hpp"
 
 void clean_up()
 {
@@ -81,6 +82,7 @@ int main(int argc, char* argv[]) {
     std::cout << "SDL2 setup complete. Running main loop..." << std::endl;
 
     initalize_context();
+    init_model();
 
     #ifdef __EMSCRIPTEN__
     // Use Emscripten's main loop

@@ -38,7 +38,7 @@ else()
     target_link_libraries(${PROJECT_NAME} PUBLIC SDL2 SDL2_image SDL2_ttf)
 endif()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm)
+target_link_libraries(${PROJECT_NAME} PUBLIC glm::glm)
 
 add_subdirectory(driver)
 add_subdirectory(source)

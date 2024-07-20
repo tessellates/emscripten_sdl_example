@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include <vector>
 #include <optional>
+#include "GridContext.hpp"
 
 struct RenderContext
 {
@@ -15,4 +16,7 @@ struct VisualContext
 {
     std::vector<SDL_Texture*> textures;
     std::vector<std::optional<RenderContext>> renderContexts;
+    GridContext grid;
+    SDL_Rect draw;
+    SDL_Surface* backdrop;
 };

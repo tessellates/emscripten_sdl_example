@@ -18,9 +18,39 @@ inline void render(SDL_Texture* texture, std::optional<RenderContext>& renderCon
 
 inline void render_loop()
 {
-    render(APP_TEXTURES[0], APP_RENDER_CONTEXTS[0]);
-    render(APP_TEXTURES[1], APP_RENDER_CONTEXTS[1]);
-    render(APP_TEXTURES[2], APP_RENDER_CONTEXTS[2]);
+    for (int i = 0; i < APP_TEXTURES.size(); ++i)
+    {
+        render(APP_TEXTURES[i], APP_RENDER_CONTEXTS[i]);
+    }
+    SDL_SetRenderDrawColor(APP_RENDERER, 255, 255, 255, 255);
+    SDL_RenderDrawRect(APP_RENDERER, &APP_CONTEXT.visualContext.draw);
+}
+
+inline void parse_click()
+{
+    auto& grid = APP_CONTEXT.visualContext.grid;
+    if (APP_EVENT.button.button == SDL_BUTTON_LEFT) 
+    {
+        int mouseX = APP_EVENT.button.x;
+        int mouseY = APP_EVENT.button.y;
+        auto point = glm::ivec2{mouseX, mouseY};
+        if (point.x >= 0)
+        {
+            if (grid.pointInGrid(point))
+            {
+                auto n_point = TO_IVECT2(grid.point(grid.coordinate(point)));
+                if (glm::ivec2{n_point.x, n_point.y} == glm::ivec2{APP_CONTEXT.visualContext.draw.x, APP_CONTEXT.visualContext.draw.y})
+                {
+                    APP_CONTEXT.visualContext.draw = {};
+                }
+                else
+                {
+                    APP_CONTEXT.visualContext.draw = {n_point.x, n_point.y, config::window_multiple*2, config::window_multiple*2};
+                }
+            }
+        }
+    }
+    
 }
 
 inline void parse_events()
@@ -44,11 +74,19 @@ inline void parse_events()
             }
             if (APP_EVENT.key.keysym.sym == SDLK_RIGHT) {
                 pos.x += config::window_multiple;
-
             }
             if (APP_EVENT.key.keysym.sym == SDLK_LEFT) {
                 pos.x -= config::window_multiple;
             }
         }
+        if (APP_EVENT.type == SDL_MOUSEBUTTONDOWN)
+        {
+            parse_click();
+        }
     }
+}
+
+inline void time_loop()
+{
+    
 }

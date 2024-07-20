@@ -3,6 +3,7 @@
 #include "Singleton.hpp"
 #include <SDL2/SDL.h>
 #include "VisualContext.hpp"
+#include "ModelContext.hpp"
 
 class ApplicationContext : public Singleton<ApplicationContext>
 {
@@ -18,6 +19,7 @@ public:
     SDL_Event event;
     bool running = true;
     VisualContext visualContext;
+    ModelContext modelContext;
 private:
     ApplicationContext() = default;
     ~ApplicationContext() = default;
@@ -30,3 +32,4 @@ public:
 #define APP_EVENT APP_CONTEXT.event
 #define APP_TEXTURES APP_CONTEXT.visualContext.textures
 #define APP_RENDER_CONTEXTS APP_CONTEXT.visualContext.renderContexts
+#define APP_MODEL APP_CONTEXT.modelContext

@@ -4,3 +4,5 @@
 #include <SDL_image.h>
 
 SDL_Texture* create_texture_from_file(SDL_Renderer* renderer, const char* filePath);
+SDL_Surface* create_surface_from_file(const char* filePath);
+SDL_Texture* create_texture_from_surface(SDL_Renderer* renderer, SDL_Surface*);
