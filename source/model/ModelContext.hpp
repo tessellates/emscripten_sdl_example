@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IDGrid.hpp"
+#include "GenericGrid.hpp"
 
 struct ModelContext
 {

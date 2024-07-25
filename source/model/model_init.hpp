@@ -17,7 +17,6 @@ inline void populate_idgrid(IDGrid& idgrid, SDL_Surface* surface)
         if (r == 0 && b == 0 && g == 0 && a == 255)
         {
             idgrid(i) = 0;
-            std::cout << "hit at" << i << std::endl;
         }
     }
     delete[] pixels;
